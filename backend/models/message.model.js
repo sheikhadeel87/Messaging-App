@@ -15,6 +15,13 @@ const messageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    edited: {
+        type: Boolean,
+        default: false
+    },
+    editedAt: {
+        type: Date
+    }
 },{ timestamps: true })
 
 const Message = mongoose.model('Message', messageSchema);

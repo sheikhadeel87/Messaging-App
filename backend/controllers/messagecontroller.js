@@ -75,3 +75,73 @@ export const getMessages = async (req, res) => {
     }
 };
 
+// Delete message
+export const deleteMessage = async (req, res) => {
+    try {
+        const { messageId } = req.params;
+        const userId = req.userId;
+
+        // Find the message
+        const message = await Message.findById(messageId);
+
+        if (!message) {
+            return res.status(404).json({ error: "Message not found" });
+        }
+
+        // Check if user is the sender
+        if (message.senderId.toString() !== userId) {
+            return res.status(403).json({ error: "You can only delete your own messages" });
+        }
+
+        // Remove message from conversation
+        await Conversation.updateOne(
+            { messages: messageId },
+            { $pull: { messages: messageId } }
+        );
+
+        // Delete the message
+        await Message.findByIdAndDelete(messageId);
+
+        res.status(200).json({ message: "Message deleted successfully" });
+    } catch (err) {
+        console.log("Error in deleteMessage controller:", err);
+        res.status(500).json({ error: "Internal Server Error", details: err.message });
+    }
+};
+
+// Edit message
+export const editMessage = async (req, res) => {
+    try {
+        const { messageId } = req.params;
+        const { message: newMessageText } = req.body;
+        const userId = req.userId;
+
+        if (!newMessageText || !newMessageText.trim()) {
+            return res.status(400).json({ error: "Message text is required" });
+        }
+
+        // Find the message
+        const message = await Message.findById(messageId);
+
+        if (!message) {
+            return res.status(404).json({ error: "Message not found" });
+        }
+
+        // Check if user is the sender
+        if (message.senderId.toString() !== userId) {
+            return res.status(403).json({ error: "You can only edit your own messages" });
+        }
+
+        // Update the message
+        message.message = newMessageText.trim();
+        message.edited = true;
+        message.editedAt = new Date();
+        await message.save();
+
+        res.status(200).json(message);
+    } catch (err) {
+        console.log("Error in editMessage controller:", err);
+        res.status(500).json({ error: "Internal Server Error", details: err.message });
+    }
+};
+
