@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { getAllUsers, getConversations } from '../../api/userApi';
-import { getMessages, sendMessage } from '../../api/messageApi';
+import { getMessages, sendMessage, deleteMessage, editMessage } from '../../api/messageApi';
 
 // Async thunk for fetching users (all users)
 export const fetchUsers = createAsyncThunk(
@@ -54,6 +54,32 @@ export const sendMessageThunk = createAsyncThunk(
   }
 );
 
+// Async thunk for deleting message
+export const deleteMessageThunk = createAsyncThunk(
+  'chat/deleteMessage',
+  async (messageId, thunkAPI) => {
+    try {
+      await deleteMessage(messageId);
+      return messageId;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || { message: 'Failed to delete message' });
+    }
+  }
+);
+
+// Async thunk for editing message
+export const editMessageThunk = createAsyncThunk(
+  'chat/editMessage',
+  async ({ messageId, message }, thunkAPI) => {
+    try {
+      const data = await editMessage(messageId, message);
+      return data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data || { message: 'Failed to edit message' });
+    }
+  }
+);
+
 const chatSlice = createSlice({
   name: 'chat',
   initialState: {
@@ -69,12 +95,16 @@ const chatSlice = createSlice({
     selectUser: (state, action) => {
       state.selectedUser = action.payload;
       state.messages = []; // Clear messages when selecting new user
+      state.error = null; // Clear any errors
     },
     clearMessages: (state) => {
       state.messages = [];
     },
     addMessage: (state, action) => {
       state.messages.push(action.payload);
+    },
+    clearError: (state) => {
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -150,9 +180,20 @@ const chatSlice = createSlice({
       .addCase(sendMessageThunk.rejected, (state, action) => {
         state.sendingMessage = false;
         state.error = action.payload?.message || 'Failed to send message';
+      })
+      // Delete Message - don't set loading/error as it's handled by toast in UI
+      .addCase(deleteMessageThunk.fulfilled, (state, action) => {
+        state.messages = state.messages.filter(msg => msg._id !== action.payload);
+      })
+      // Edit Message - don't set loading/error as it's handled by toast in UI
+      .addCase(editMessageThunk.fulfilled, (state, action) => {
+        const index = state.messages.findIndex(msg => msg._id === action.payload._id);
+        if (index !== -1) {
+          state.messages[index] = action.payload;
+        }
       });
   },
 });
 
-export const { selectUser, clearMessages, addMessage } = chatSlice.actions;
+export const { selectUser, clearMessages, addMessage, clearError } = chatSlice.actions;
 export default chatSlice.reducer;

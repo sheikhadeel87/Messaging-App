@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Conversation from './Conversation'
-import { fetchUsers } from '../../redux/slices/chatSlice'
+import { fetchUsers, clearError } from '../../redux/slices/chatSlice'
 
 function Conversations () {
   const dispatch = useDispatch()
@@ -9,6 +9,7 @@ function Conversations () {
 
   useEffect(() => {
     console.log('Fetching users...')
+    dispatch(clearError()) // Clear any previous errors
     dispatch(fetchUsers())
       .then(() => console.log('Users fetched successfully'))
       .catch((err) => console.error('Error fetching users:', err))

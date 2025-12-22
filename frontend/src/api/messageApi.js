@@ -12,3 +12,15 @@ export const sendMessage = async (userId, message) => {
   const response = await API.post(`/messages/send/${userId}`, { message });
   return response.data;
 };
+
+// Delete a message
+export const deleteMessage = async (messageId) => {
+  const response = await API.delete(`/messages/${messageId}`);
+  return response.data;
+};
+
+// Edit a message
+export const editMessage = async (messageId, message) => {
+  const response = await API.put(`/messages/${messageId}`, { message });
+  return response.data;
+};
