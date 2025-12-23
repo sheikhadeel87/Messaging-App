@@ -1,10 +1,32 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import Sidebar from '../../components/sidebar/Sidebar.jsx'
 import MessageContainer from '../../components/messages/MessageContainer.jsx'
+import { socket } from '../../socket.js'
+import { addMessage } from '../../redux/slices/chatSlice.js'
 
 function Home () {
   const { user } = useSelector((state) => state.auth)
+  const { selectedUser } = useSelector((state) => state.chat)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (user?._id) {
+      socket.connect()
+      
+      socket.on('receiveMessage', (message) => {
+        // Only add if it's from the currently selected user
+        if (message.senderId === selectedUser?._id) {
+          dispatch(addMessage(message))
+        }
+      })
+
+      return () => {
+        socket.off('receiveMessage')
+        socket.disconnect()
+      }
+    }
+  }, [user, selectedUser, dispatch])
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
