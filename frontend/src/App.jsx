@@ -32,14 +32,11 @@ function App() {
             </PublicRoute>
           }
         />
-        <Route
-          path='/signup'
-          element={
+        <Route path='/signup' element={
             <PublicRoute>
               <Signup />
             </PublicRoute>
-          }
-        />
+          }/>
       </Routes>
     </>
   )
