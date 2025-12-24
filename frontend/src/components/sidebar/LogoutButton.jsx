@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { logout } from '../../redux/slices/authSlice'
 import toast from 'react-hot-toast'
 import axios from 'axios'
+import { logoutUser } from '../../api/authApi'
 
 function LogoutButton () {
   const dispatch = useDispatch()
@@ -11,9 +12,7 @@ function LogoutButton () {
   const handleLogout = async () => {
     try {
       // Call backend logout endpoint
-      await axios.post('http://localhost:5002/api/auth/logout', {}, {
-        withCredentials: true
-      })
+      await logoutUser()
       
       // Dispatch Redux logout action
       dispatch(logout())
