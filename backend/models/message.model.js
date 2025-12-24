@@ -13,9 +13,10 @@ const messageSchema = new mongoose.Schema({
     },
     message: {
         type: String,
-        required: true
+        required: false,  // Allow messages without text (image only)
+        default: ''
     },
-    imageUrl: {  // NEW FIELD
+    imageUrl: {
         type: String,
         default: null
     },
