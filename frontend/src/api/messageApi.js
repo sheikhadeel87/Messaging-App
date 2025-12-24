@@ -8,8 +8,8 @@ export const getMessages = async (userId) => {
 };
 
 // Send a message to a specific user
-export const sendMessage = async (userId, message) => {
-  const response = await API.post(`/messages/send/${userId}`, { message });
+export const sendMessage = async (userId, messageData) => {
+  const response = await API.post(`/messages/send/${userId}`,  messageData );
   return response.data;
 };
 
