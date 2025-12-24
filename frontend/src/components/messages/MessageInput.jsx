@@ -6,9 +6,11 @@ import React, { useState, useEffect } from 'react'
 import { BsSend } from 'react-icons/bs'
 import { useDispatch, useSelector } from 'react-redux'
 import { addMessage } from '../../redux/slices/chatSlice'
-import { socket } from '../../socket'
+// import { socket } from '../../socket'
+import API from '../../api/axios'
 import toast from 'react-hot-toast'
 import ImageUpload from './ImageUpload'
+
 
 function MessageInput() {
     const [message, setMessage] = useState('')
@@ -17,25 +19,25 @@ function MessageInput() {
     const dispatch = useDispatch()
     const { selectedUser } = useSelector((state) => state.chat)
 
-    useEffect(() => {
-        // Listen for message confirmation
-        socket.on('messageSent', (sentMessage) => {
-            dispatch(addMessage(sentMessage))
-            setSending(false)
-        })
+    // useEffect(() => {
+    //     // Listen for message confirmation
+    //     socket.on('messageSent', (sentMessage) => {
+    //         dispatch(addMessage(sentMessage))
+    //         setSending(false)
+    //     })
 
-        socket.on('error', () => {
-            toast.error('Failed to send message')
-            setSending(false)
-        })
+    //     socket.on('error', () => {
+    //         toast.error('Failed to send message')
+    //         setSending(false)
+    //     })
 
-        return () => {
-            socket.off('messageSent')
-            socket.off('error')
-        }
-    }, [dispatch])
+    //     return () => {
+    //         socket.off('messageSent')
+    //         socket.off('error')
+    //     }
+    // }, [dispatch])
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
         
         // Allow submission if either message or image exists
@@ -50,13 +52,35 @@ function MessageInput() {
         }
 
         setSending(true)
-        socket.emit('sendMessage', {
-            receiverId: selectedUser._id,
-            message: message.trim(),
-            imageUrl: imageUrl || null  // Include image URL
-        })
-        setMessage('')
-        setImageUrl(null)  // Clear image after sending
+        // USING REST API INSTEAD OF SOCKET.IO
+        try {
+            const sentMessage = await sendMessageAPI(selectedUser._id, {
+                message: message.trim(),
+                imageUrl: imageUrl || null
+            })
+            
+            // Add the sent message to Redux store
+            dispatch(addMessage(sentMessage))
+            toast.success('Message sent!')
+            
+            // Clear inputs
+            setMessage('')
+            setImageUrl(null)
+        } catch (error) {
+            console.error('Error sending message:', error)
+            toast.error(error.response?.data?.error || 'Failed to send message')
+        } finally {
+            setSending(false)
+        }
+        // ORIGINAL SOCKET CODE - DISABLED
+        // setSending(true)
+        // socket.emit('sendMessage', {
+        //     receiverId: selectedUser._id,
+        //     message: message.trim(),
+        //     imageUrl: imageUrl || null  // Include image URL
+        // })
+        // setMessage('')
+        // setImageUrl(null)  // Clear image after sending
     }
 
     const handleImageUploaded = (url) => {
