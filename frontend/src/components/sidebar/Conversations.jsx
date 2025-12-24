@@ -1,27 +1,38 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Conversation from './Conversation'
-import { fetchUsers, clearError } from '../../redux/slices/chatSlice'
+import { fetchConversations, fetchUsers, clearError } from '../../redux/slices/chatSlice'
 
 function Conversations () {
   const dispatch = useDispatch()
-  const { users, loading, error } = useSelector((state) => state.chat)
+  const { conversations, users, loading, error } = useSelector((state) => state.chat)
 
   useEffect(() => {
-    console.log('Fetching users...')
+    console.log('Fetching conversations...')
     dispatch(clearError()) // Clear any previous errors
-    dispatch(fetchUsers())
-      .then(() => console.log('Users fetched successfully'))
-      .catch((err) => console.error('Error fetching users:', err))
+    
+    // Fetch conversations (users with messages)
+    dispatch(fetchConversations())
+      .then(() => console.log('Conversations fetched successfully'))
+      .catch((err) => {
+        console.error('Error fetching conversations:', err)
+        // Fallback to fetching all users if conversations fail
+        dispatch(fetchUsers())
+      })
   }, [dispatch])
 
-  console.log('Conversations render:', { loading, usersCount: users.length, error })
+  console.log('Conversations render:', { 
+    loading, 
+    conversationsCount: conversations.length, 
+    usersCount: users.length, 
+    error 
+  })
 
   if (loading) {
     return (
       <div className='py-2 flex flex-col items-center gap-2'>
         <span className='loading loading-spinner'></span>
-        <p className='text-xs text-gray-500'>Loading users...</p>
+        <p className='text-xs text-gray-500'>Loading conversations...</p>
       </div>
     )
   }
@@ -32,7 +43,7 @@ function Conversations () {
         <p className='text-red-500 text-sm'>{error}</p>
         <button 
           className='btn btn-sm btn-primary mt-2'
-          onClick={() => dispatch(fetchUsers())}
+          onClick={() => dispatch(fetchConversations())}
         >
           Retry
         </button>
@@ -40,15 +51,19 @@ function Conversations () {
     )
   }
 
-  if (users.length === 0) {
+  // Show conversations if available, otherwise show all users
+  const displayList = conversations.length > 0 ? conversations : users.map(u => ({ user: u, latestMessage: null }))
+
+  if (displayList.length === 0) {
     return (
       <div className='py-2 text-center text-gray-500'>
-        <p>No users found</p>
+        <p>No conversations yet</p>
+        <p className='text-xs mt-1'>Start chatting with someone!</p>
         <button 
           className='btn btn-sm btn-primary mt-2'
           onClick={() => dispatch(fetchUsers())}
         >
-          Refresh
+          Show All Users
         </button>
       </div>
     )
@@ -56,11 +71,11 @@ function Conversations () {
 
   return (
     <div className='py-2 flex flex-col overflow-auto'>
-      {users.map((user) => (
+      {displayList.map((item) => (
         <Conversation 
-          key={user._id} 
-          user={user}
-          latestMessage={null}
+          key={item.user._id} 
+          user={item.user}
+          latestMessage={item.latestMessage}
         />
       ))}
     </div>
