@@ -143,11 +143,18 @@ app.use('/api/conversations', conversationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Initialize Socket.IO handlers
-initializeSocket(io);
+// Initialize Socket.IO handlers (won't work on Vercel serverless)
+if (process.env.NODE_ENV !== 'production') {
+  initializeSocket(io);
+}
 
-server.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
-});
+// Start server only in non-serverless environments
+if (process.env.VERCEL !== '1') {
+  server.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+  });
+} else {
+  console.log('⚠️  Running in Vercel serverless mode - Socket.IO disabled');
+}
 
 export default app;
