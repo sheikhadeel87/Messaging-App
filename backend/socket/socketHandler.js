@@ -25,9 +25,14 @@ export const initializeSocket = (io) => {
     socket.join(socket.userId);
 
     // Handle sendMessage event
-    socket.on('sendMessage', async ({ receiverId, message }) => {
+    socket.on('sendMessage', async ({ receiverId, message, image }) => {
       try {
         const senderId = socket.userId;
+
+        // Validate: either message or imageUrl must exist
+    if (!message && !imageUrl) {
+      return socket.emit('error', { message: 'Message or image is required' });
+    }
         
         let conversation = await Conversation.findOne({
           participants: { $all: [senderId, receiverId] },
@@ -39,7 +44,13 @@ export const initializeSocket = (io) => {
           });
         }
 
-        const newMessage = new Message({ senderId, receiverId, message });
+        const newMessage = new Message({ 
+          senderId, 
+          receiverId, 
+          message: message || '',  // Empty string if only image
+          imageUrl: imageUrl || null  // Store image URL
+        });
+        
         conversation.messages.push(newMessage._id);
 
         await Promise.all([conversation.save(), newMessage.save()]);

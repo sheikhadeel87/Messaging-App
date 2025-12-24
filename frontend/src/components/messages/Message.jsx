@@ -96,60 +96,79 @@ function Message({ message }) {
                 </div>
             </div>
 
-            <div className={`chat-bubble ${textColor} ${bubbleBg} relative`}>
-                {isEditing ? (
-                    <div className="flex flex-col gap-2">
-                        <textarea
-                            className="textarea textarea-sm bg-white/20 text-white resize-none"
-                            value={editedText}
-                            onChange={(e) => setEditedText(e.target.value)}
-                            rows={2}
-                            autoFocus
-                        />
-                        <div className="flex gap-2 justify-end">
-                            <button 
-                                className="btn btn-xs btn-success"
-                                onClick={handleEditSave}
-                            >
-                                <MdCheck />
-                            </button>
-                            <button 
-                                className="btn btn-xs btn-error"
-                                onClick={handleEditCancel}
-                            >
-                                <MdClose />
-                            </button>
-                        </div>
-                    </div>
-                ) : (
-                    <>
-                        {message.message}
-                        {message.edited && (
-                            <span className="text-xs opacity-70 ml-2">(edited)</span>
-                        )}
-                    </>
-                )}
-                
-                {/* Action buttons - only show for own messages */}
-                {isMyMessage && !isEditing && showActions && (
-                    <div className="absolute -top-8 right-0 flex gap-1 bg-gray-800 rounded-lg p-1 shadow-lg">
-                        <button
-                            className="btn btn-xs btn-ghost text-white hover:bg-white/20"
-                            onClick={() => setIsEditing(true)}
-                            title="Edit message"
-                        >
-                            <MdEdit size={16} />
-                        </button>
-                        <button
-                            className="btn btn-xs btn-ghost text-white hover:bg-red-500"
-                            onClick={handleDelete}
-                            title="Delete message"
-                        >
-                            <MdDelete size={16} />
-                        </button>
-                    </div>
-                )}
+            <div className={`chat-bubble ${textColor} ${bubbleBg} relative max-w-md`}>
+    {/* Show image if exists */}
+    {message.imageUrl && (
+        <img 
+        src={`https://catalina-pentasyllabic-hye.ngrok-free.dev${message.imageUrl}`}
+            alt="Shared image"
+            className="max-w-xs rounded-lg cursor-pointer hover:opacity-90 transition-opacity mb-2"
+            onClick={() => window.open(`${import.meta.env.VITE_API_BASE_URL}${message.imageUrl}`, '_blank')}
+            onError={(e) => {
+                e.target.style.display = 'none';
+                toast.error('Failed to load image');
+            }}
+        />
+    )}
+    
+    {isEditing ? (
+        <div className="flex flex-col gap-2">
+            <textarea
+                className="textarea textarea-sm bg-white/20 text-white resize-none"
+                value={editedText}
+                onChange={(e) => setEditedText(e.target.value)}
+                rows={2}
+                autoFocus
+            />
+            <div className="flex gap-2 justify-end">
+                <button 
+                    className="btn btn-xs btn-success"
+                    onClick={handleEditSave}
+                >
+                    <MdCheck />
+                </button>
+                <button 
+                    className="btn btn-xs btn-error"
+                    onClick={handleEditCancel}
+                >
+                    <MdClose />
+                </button>
             </div>
+        </div>
+    ) : (
+        <>
+            {/* Only show text if it exists */}
+            {message.message && (
+                <>
+                    {message.message}
+                    {message.edited && (
+                        <span className="text-xs opacity-70 ml-2">(edited)</span>
+                    )}
+                </>
+            )}
+        </>
+    )}
+    
+    {/* Action buttons - only show for own messages */}
+    {isMyMessage && !isEditing && showActions && (
+        <div className="absolute -top-8 right-0 flex gap-1 bg-gray-800 rounded-lg p-1 shadow-lg">
+            <button
+                className="btn btn-xs btn-ghost text-white hover:bg-white/20"
+                onClick={() => setIsEditing(true)}
+                title="Edit message"
+            >
+                <MdEdit size={16} />
+            </button>
+            <button
+                className="btn btn-xs btn-ghost text-white hover:bg-red-500"
+                onClick={handleDelete}
+                title="Delete message"
+            >
+                <MdDelete size={16} />
+            </button>
+        </div>
+    )}
+</div>
             
             <div className="chat-footer opacity-50 text-gray-900 text-xs">
                 {message.createdAt ? formatTime(message.createdAt) : 'Now'}
