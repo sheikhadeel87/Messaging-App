@@ -15,6 +15,10 @@ const messageSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    imageUrl: {  // NEW FIELD
+        type: String,
+        default: null
+    },
     edited: {
         type: Boolean,
         default: false

@@ -4,11 +4,11 @@ import mongoose from 'mongoose';
 
 export const sendMessage = async (req, res) => {
     try {
-        const { message } = req.body;
+        const { message, imageUrl } = req.body;
         const { id: receiverId } = req.params;
         const senderId = req.userId;
 
-        if (!message) {
+        if (!message && !imageUrl) {
             return res.status(400).json({ error: "Message is required" });
         }
 
@@ -26,6 +26,7 @@ export const sendMessage = async (req, res) => {
             senderId,
             receiverId,
             message,
+            imageUrl,
         });
 
         if (newMessage) {

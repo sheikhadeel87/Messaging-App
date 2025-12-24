@@ -26,3 +26,7 @@ Thumbs.db
 # VS Code
 .vscode/
 package-lock.json
+
+# Uploads folder - keep folder, ignore files
+backend/uploads/*
+!backend/uploads/.gitkeep

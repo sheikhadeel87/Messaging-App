@@ -7,7 +7,8 @@ const generateTokenAndSetCookie = (userId, res) => {
     res.cookie('jwt', token, {
         httpOnly: true,
         maxAge: 15 * 24 * 60 * 60 * 1000, // 15 days
-        sameSite: 'strict', // prevent CSRF attacks
+        sameSite: 'none', // Allow cross-domain cookies (required for Vercel → Ngrok)
+        secure: true, // Required when sameSite is 'none' (HTTPS only)
     });
     
     return token;
