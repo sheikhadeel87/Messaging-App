@@ -7,7 +7,7 @@ import { BsSend } from 'react-icons/bs'
 import { useDispatch, useSelector } from 'react-redux'
 import { addMessage } from '../../redux/slices/chatSlice'
 // import { socket } from '../../socket'
-import API from '../../api/axios'
+import { sendMessage as sendMessageAPI } from '../../api/messageApi'
 import toast from 'react-hot-toast'
 import ImageUpload from './ImageUpload'
 
