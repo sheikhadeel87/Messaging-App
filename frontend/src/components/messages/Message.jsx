@@ -100,10 +100,10 @@ function Message({ message }) {
     {/* Show image if exists */}
     {message.imageUrl && (
         <img 
-        src={`https://catalina-pentasyllabic-hye.ngrok-free.dev${message.imageUrl}`}
+            src={message.imageUrl}
             alt="Shared image"
             className="max-w-xs rounded-lg cursor-pointer hover:opacity-90 transition-opacity mb-2"
-            onClick={() => window.open(`${import.meta.env.VITE_API_BASE_URL}${message.imageUrl}`, '_blank')}
+            onClick={() => window.open(message.imageUrl, '_blank')}
             onError={(e) => {
                 e.target.style.display = 'none';
                 toast.error('Failed to load image');

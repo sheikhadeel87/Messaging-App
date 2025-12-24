@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { Server } from 'socket.io';
+// import { Server } from 'socket.io';
 import http from 'http';
 import uploadRoutes from './routes/uploadRoutes.js';
 
@@ -63,10 +63,10 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// Initialize Socket.IO
-const io = new Server(server, {
-  cors: corsOptions,
-});
+// Initialize Socket.IO comment to test vercel deployment
+// const io = new Server(server, {
+//   cors: corsOptions,
+// });
 
 // Connect to MongoDB
 connectDB();
@@ -143,10 +143,10 @@ app.use('/api/conversations', conversationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Initialize Socket.IO handlers (won't work on Vercel serverless)
-if (process.env.NODE_ENV !== 'production') {
-  initializeSocket(io);
-}
+// Initialize Socket.IO handlers (won't work on Vercel serverless)comment to test vercel deployment
+// if (process.env.NODE_ENV !== 'production') {
+//   initializeSocket(io);
+// }
 
 // Start server only in non-serverless environments
 if (process.env.VERCEL !== '1') {

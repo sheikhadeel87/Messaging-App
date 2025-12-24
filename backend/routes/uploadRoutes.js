@@ -12,12 +12,12 @@ router.post('/image', protectRoute, upload.single('image'), (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
-        // Return the image URL
-        const imageUrl = `/uploads/${req.file.filename}`;
+        // Cloudinary automatically provides the secure URL in req.file.path
+        const imageUrl = req.file.path; // This is the Cloudinary URL
         
         res.status(200).json({
             message: 'Image uploaded successfully',
-            imageUrl,
+            imageUrl: imageUrl,
             filename: req.file.filename,
             size: req.file.size
         });

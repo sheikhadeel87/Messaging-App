@@ -99,7 +99,7 @@ function MessageInput() {
             {imageUrl && (
                 <div className='flex items-center gap-2 bg-gray-700 p-2 rounded-lg'>
                     <img 
-                        src="https://via.placeholder.com/150"
+                        src={imageUrl}
                         alt="Preview" 
                         className="w-16 h-16 object-cover rounded" 
                     />
