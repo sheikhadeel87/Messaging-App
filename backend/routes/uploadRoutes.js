@@ -12,6 +12,18 @@ router.post('/image', protectRoute, upload.single('image'), (req, res) => {
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
+        // Check if Cloudinary is configured
+        const hasCloudinary = process.env.CLOUDINARY_CLOUD_NAME && 
+                             process.env.CLOUDINARY_API_KEY && 
+                             process.env.CLOUDINARY_API_SECRET;
+
+        if (!hasCloudinary) {
+            return res.status(503).json({ 
+                error: 'Image upload service not configured',
+                details: 'Cloudinary credentials are missing. Please contact the administrator.'
+            });
+        }
+
         // Cloudinary automatically provides the secure URL in req.file.path
         const imageUrl = req.file.path; // This is the Cloudinary URL
         

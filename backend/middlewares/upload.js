@@ -2,22 +2,41 @@ import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// Check if Cloudinary credentials are configured
+const hasCloudinaryCredentials = 
+    process.env.CLOUDINARY_CLOUD_NAME && 
+    process.env.CLOUDINARY_API_KEY && 
+    process.env.CLOUDINARY_API_SECRET;
 
-// Configure Cloudinary storage
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'messaging-app', // Folder name in Cloudinary
-        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-        transformation: [{ width: 1000, height: 1000, crop: 'limit' }] // Resize large images
-    }
-});
+if (!hasCloudinaryCredentials) {
+    console.warn('⚠️  WARNING: Cloudinary credentials not found in environment variables!');
+    console.warn('⚠️  Image uploads will not work. Please add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET to your environment.');
+}
+
+// Configure Cloudinary only if credentials are available
+if (hasCloudinaryCredentials) {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET
+    });
+}
+
+// Configure Cloudinary storage with error handling
+let storage;
+try {
+    storage = hasCloudinaryCredentials ? new CloudinaryStorage({
+        cloudinary: cloudinary,
+        params: {
+            folder: 'messaging-app',
+            allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+            transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
+        }
+    }) : multer.memoryStorage(); // Fallback to memory storage if no credentials
+} catch (error) {
+    console.error('Error configuring Cloudinary storage:', error);
+    storage = multer.memoryStorage(); // Fallback
+}
 
 // File filter - only allow images
 const fileFilter = (req, file, cb) => {
