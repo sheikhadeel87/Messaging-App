@@ -8,9 +8,11 @@ const hasCloudinaryCredentials =
     process.env.CLOUDINARY_API_KEY && 
     process.env.CLOUDINARY_API_SECRET;
 
-if (!hasCloudinaryCredentials) {
-    console.warn('⚠️  WARNING: Cloudinary credentials not found in environment variables!');
-    console.warn('⚠️  Image uploads will not work. Please add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET to your environment.');
+// Log Cloudinary status (only once)
+if (hasCloudinaryCredentials) {
+    console.log('✅ Cloudinary configured for image uploads');
+} else {
+    console.log('ℹ️  Cloudinary not configured - image uploads disabled');
 }
 
 // Configure Cloudinary only if credentials are available
