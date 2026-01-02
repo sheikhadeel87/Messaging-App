@@ -29,32 +29,32 @@ function Home () {
   // }, [user, selectedUser, dispatch])
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen p-2 sm:p-4">
       {/* Header with logged-in user info */}
-      <div className="w-[900px] bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-lg shadow-lg px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="w-full max-w-[900px] bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-lg shadow-lg px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-3">
           <div className="avatar">
-            <div className="w-10 h-10 rounded-full ring ring-white ring-offset-2">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full ring-2 sm:ring ring-white ring-offset-1 sm:ring-offset-2">
               <img 
                 src={user?.profilePic || "https://img.daisyui.com/images/profile/demo/kenobee@192.webp"} 
                 alt={user?.fullName} 
               />
             </div>
           </div>
-          <div className="text-white">
-            <p className="font-bold text-lg">{user?.fullName || 'User'}</p>
-            <p className="text-xs opacity-90">@{user?.username || 'username'}</p>
+          <div className="text-white min-w-0">
+            <p className="font-bold text-xs sm:text-sm md:text-lg truncate">{user?.fullName || 'User'}</p>
+            <p className="text-[10px] sm:text-xs opacity-90 truncate">@{user?.username || 'username'}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-white text-sm font-semibold px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">
+          <span className="text-white text-[10px] sm:text-xs md:text-sm font-semibold px-2 sm:px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">
             Online
           </span>
         </div>
       </div>
 
-      {/* Main chat container */}
-      <div className="flex w-[900px] h-[600px] bg-white/90 backdrop-blur-sm rounded-b-lg shadow-lg overflow-hidden">
+      {/* Main chat container - responsive height and layout */}
+      <div className="flex flex-col md:flex-row w-full max-w-[900px] h-[calc(100vh-120px)] sm:h-[500px] md:h-[600px] bg-white/90 backdrop-blur-sm rounded-b-lg shadow-lg overflow-hidden">
         <Sidebar />
         <MessageContainer />
       </div>
