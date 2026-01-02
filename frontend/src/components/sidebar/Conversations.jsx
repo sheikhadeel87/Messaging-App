@@ -16,8 +16,6 @@ function Conversations () {
       .then(() => console.log('Conversations fetched successfully'))
       .catch((err) => {
         console.error('Error fetching conversations:', err)
-        // Fallback to fetching all users if conversations fail
-        dispatch(fetchUsers())
       })
   }, [dispatch])
 
